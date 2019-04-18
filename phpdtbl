@@ -80,7 +80,7 @@
 
     <input type="button" onclick="tableToExcel('example', 'Medžiagų pareikalavimas')" value="XLSX">
   <!-- <button id="exportas">DOCX</button> -->
-    <button id="btnExport" onclick="doit('xlsx');"> EXPORT </button>
+   
 
     <div id="docx">
         <div class="WordSection1">
@@ -93,7 +93,7 @@
         </tr>
         <tr hidden></tr>
         <tr>
-            <th colspan="10" hidden style=" font-size: 16px">INŽINIERINIS TECHNIKOS DEPARTAMENTAS</th>
+            <th colspan="10" hidden style=" font-size: 16px; text-align:center;">INŽINIERINIS TECHNIKOS DEPARTAMENTAS</th>
         </tr>
         <tr hidden></tr>
         <tr>
@@ -285,20 +285,14 @@
                 }
 
                 var link = document.createElement("a");
-                link.download = "atsargos.xls";
                 link.href = uri + base64(format(template, ctx));
-                link.click();
-
-
+                const blob = new Blob([format(template, ctx)], {
+                    type: "application/vnd.ms-excel;charset=utf-8"
+                });
+                saveAs(blob, "Atsargos.xls");
 
             }
         })()
-
-
-
-
-
-
     </script>
 
     <script>
@@ -342,19 +336,17 @@
 
 
 
-<script>
-    function doit(type, fn, dl) {
-
-        var elt = document.getElementById('examplecopy');
-        var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet JS" });
-        return dl ?
-            XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
-            XLSX.writeFile(wb, fn || ('test.' + (type || 'xlsx')));
-    }
-</script>
 
 
 @endsection
+
+
+
+
+
+
+
+
 
 
 
