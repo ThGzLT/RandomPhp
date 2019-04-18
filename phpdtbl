@@ -1,4 +1,7 @@
-<?php
+@extends('layouts.rodymas')
+
+@section('content')
+    <?php
    use App\Http\Middleware\Authenticate;
 
     ?>
@@ -23,6 +26,10 @@
         padding: 0;
         visibility: hidden;
     }
+    i.fa.fa-remove:hover {
+
+        transform: scale(3);
+    }
 
 </style>
 
@@ -42,7 +49,7 @@
 ">
         <thead>
         <tr>
-            <th scope="col"  style="text-align: right;">Produkto kodas</th>
+            <th scope="col"  style="text-align: center;">Produkto kodas</th>
             <th scope="col" style="text-align: left;">Produktas</th>
             <th scope="col">Matas</th>
             <th scope="col">Kiekis</th>
@@ -54,11 +61,11 @@
             @foreach($alt as $track)
                 <tr class="hover">
 
-                    <td class="tikr" style="text-align: right; border:thin solid black;    vertical-align: middle;">{{$track['produkto_kodas']}}  </td>
-                    <td style="text-align: left; border:thin solid black;    vertical-align: middle;">{{$track['produktas']}}</td>
-                    <td style="text-align: center;border:thin solid black  ;  vertical-align: middle;">{{$track['matas']}}</td>
-                    <td class="SecondTable" style="border:thin solid black ;   vertical-align: middle;">{{$track['kiekis']}}</td>
-                    <td class="SecondTable" style="border:thin solid black">    <button id="Prideti"><i class="fa fa-plus" style="font-size:24px;color:green;padding-top: 3px";></i></button></td>
+                    <td class="tikr" style="text-align: center; border:thin solid black; border-style:hidden;   vertical-align: middle;">{{$track['produkto_kodas']}}  </td>
+                    <td style="text-align: left; border:thin solid black; border-style:hidden;   vertical-align: middle;">{{$track['produktas']}}</td>
+                    <td style="text-align: center;border:thin solid black  ; border-style:hidden; vertical-align: middle;">{{$track['matas']}}</td>
+                    <td class="SecondTable" style="border:thin solid black ;  border-style:hidden; vertical-align: middle;">{{$track['kiekis']}}</td>
+                    <td class="SecondTable" style="border:thin solid black; border-style:hidden;">    <button id="Prideti"><i class="fa fa-plus" style="font-size:24px;color:green;padding-top: 3px; visibility: visible";></i></button></td>
 
                 </tr>
             @endforeach
@@ -72,7 +79,9 @@
     </div>
 
     <input type="button" onclick="tableToExcel('example', 'Medžiagų pareikalavimas')" value="XLSX">
-    <button id="export">DOCX</button>
+  <!-- <button id="exportas">DOCX</button> -->
+    <button id="btnExport" onclick="doit('xlsx');"> EXPORT </button>
+
     <div id="docx">
         <div class="WordSection1">
 
@@ -103,12 +112,13 @@
 
         <tr >
 
-            <th style="border:thin solid black;width: 160px;vertical-align: middle; text-align: right;">Produkto kodas</th>
-            <th style="border:thin solid black; width: 280px;vertical-align: middle; text-align: left;">Produktas</th>
-            <th style="border:thin solid black; width: 90px;vertical-align: middle;">Matas</th>
-            <th colspan="5" style="border:thin solid black;vertical-align: middle;">Paskirtis</th>
-            <th  style="border:thin solid black; width:90px;vertical-align: middle;">Kiekis</th>
-            <th  style="border:thin solid black; width:110px;vertical-align: middle;">Suma</th>
+            <th style="border:thin solid black;width: 120px;vertical-align: middle; text-align: center;border-style:hidden;">Produkto kodas</th>
+            <th style="border:thin solid black; width: 220px;vertical-align: middle; text-align: left;border-style:hidden;">Produktas</th>
+            <th style="border:thin solid black; width: 90px;vertical-align: middle;border-style:hidden;">Matas</th>
+            <th colspan="4" style="border:thin solid black;vertical-align: middle;border-style:hidden;">Paskirtis</th>
+            <th hidden style="border:thin solid black; width:90px;vertical-align: middle;border-style:hidden;">Kaina</th>
+            <th  style="border:thin solid black; width:90px;vertical-align: middle;border-style:hidden;">Kiekis</th>
+            <th hidden style="border:thin solid black; width:110px;vertical-align: middle;border-style:hidden;">Suma</th>
 
 
         </tr>
@@ -167,40 +177,34 @@
             "Psichologija",
             "Administracija",
             "Konsultacija",
-            "Priemimas",
-            "COBOL",
-            "ColdFusion",
-            "Erlang",
-            "Fortran",
-            "Groovy",
-            "Haskell",
-            "Java",
-            "JavaScript",
-            "Lisp",
-            "Perl",
-            "PHP",
-            "Python",
-            "Ruby",
-            "Scala",
-            "Scheme"
+            "Priemimas"
         ];
 
 
 
 
+       var count = 10;
 
+        console.log(count);
         $("#example").on("click", "button", function() {
 
-            $(this).closest("tr").clone().appendTo('#examplecopy')
-                .append("<td id='tags' colspan='5'  class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:justify; vertical-align: middle; width:250px\"></td>")
-                .append("<td    class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle; \"></td>")
-                        .append("<td  class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;\"></td>")
-                .append("<td style='vertical-align: middle; text-align: left; width: 50px'><button style='padding: 0;\n" +
-                    "        visibility: hidden;'><i class=\"fa fa-remove\" style=\"font-size:20px;color:red;visibility: visible;vertical-align: middle \"></i></button></td>").find('td.SecondTable').remove();
+            count++;
+
+
+
+
+
+                $(this).closest("tr").clone().appendTo('#examplecopy')
+                .append("<td id='tags' colspan='4'  class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:justify;border-style:hidden; vertical-align: middle; width:250px\"></td>")
+                    .append("<td hidden   class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;border-style:hidden; \"></td>")
+                .append("<td    class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;border-style:hidden; \"></td>")
+                        .append("<td hidden x:num x:fmla=\"=SUM(H" + count + " *I" + count +")\" class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;border-style:hidden;\"><a name=\"NameRange1\"></a></td>")
+                .append("<td hidden style='vertical-align: middle; text-align: left; width: 50px;border-style:hidden;\'></td>")
+                    .append("<button style='padding: 0;\n" +
+                    "        '><i class=\"fa fa-remove\" style=\"font-size:20px;color:red;visibility: visible;vertical-align: middle; margin-top: -2px;\"></i></button>").find('td.SecondTable').remove();
             $( "td.SecTable" ).autocomplete({
                 source: tags })
         });
-
 
 
 
@@ -221,6 +225,7 @@
 
         $("#examplecopy").on("click", "button", function() {
             $(this).closest("tr").remove();
+            count--;
         });
     </script>
 
@@ -232,16 +237,33 @@
 
                 template = '<html xmlns:v="urn:schemas-microsoft-com:vml"xmlns:o="urn:schemas-microsoft-com:office:office"xmlns:x="urn:schemas-microsoft-com:office:excel"xmlns="http://www.w3.org/TR/REC-html40">'+
                     '<head> <meta http-equiv=Content-Type content="text/html; charset=utf-8"> <meta name=ProgId content=Excel.Sheet> <meta name=Generator content="Microsoft Excel 11">'+
-                    ' <!--[if gte mso 9]><xml><o:DocumentProperties><o:Author>Pat Willener</o:Author><o:Company>Good Day Books</o:Company>'+
+                    ' <!--[if gte mso 9]><xml>' +
+                    '<o:DocumentProperties><o:Author>Pat Willener</o:Author>' +
+                    '<o:Company>Good Day Books</o:Company>'+
                     '  </o:DocumentProperties><o:OfficeDocumentSettings><o:RelyOnVML/><o:AllowPNG/></o:OfficeDocumentSettings>'+
                     '  </xml><![endif]-->'+
                     ' <style><!--table {mso-displayed-decimal-separator:"\.";mso-displayed-thousand-separator:"\,";}  @page {mso-header-data:"&";  mso-footer-data:"Puslapis &P iš &N";'+
                     ' margin:.31in .31in .31in .31in;  mso-header-margin:0in;  mso-footer-margin:0in;  mso-page-orientation:landscape;}  --></style>'+
-                    ' <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name></x:Name><x:WorksheetOptions><x:Print><x:ValidPrinterInfo/>'+
-                    ' <x:PaperSizeIndex>9</x:PaperSizeIndex><x:HorizontalResolution>600</x:HorizontalResolution><x:VerticalResolution>600</x:VerticalResolution></x:Print><x:Selected/>'+
-                    ' <x:Panes><x:Pane><x:Number>1</x:Number><x:ActiveRow>1</x:ActiveRow></x:Pane></x:Panes><x:ProtectContents>False</x:ProtectContents><x:ProtectObjects>False</x:ProtectObjects>'+
-                    '<x:ProtectScenarios>False</x:ProtectScenarios></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets><x:WindowHeight>8835</x:WindowHeight><x:WindowWidth>15180</x:WindowWidth>'+
-                    ' <x:WindowTopX>120</x:WindowTopX><x:WindowTopY>105</x:WindowTopY><x:ProtectStructure>False</x:ProtectStructure><x:ProtectWindows>False</x:ProtectWindows></x:ExcelWorkbook>'+
+                    ' <!--[if gte mso 9]><xml>' +
+                    '<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
+                    '<x:Name></x:Name><x:WorksheetOptions><x:Print><x:ValidPrinterInfo/>'+
+                    ' <x:PaperSizeIndex>9</x:PaperSizeIndex>' +
+                    '<x:HorizontalResolution>600</x:HorizontalResolution>' +
+                    '<x:VerticalResolution>600</x:VerticalResolution></x:Print><x:Selected/>'+
+                    ' <x:Panes><x:Pane>' +
+                    '<x:Number>1</x:Number>' +
+                    '<x:ActiveRow>1</x:ActiveRow>' +
+                   ' <x:RangeSelection>$I$1:$J$1</x:RangeSelection>' +
+                    '</x:Pane>' +
+                    '</x:Panes>' +
+                    '<x:ProtectContents>False</x:ProtectContents>' +
+                    '<x:ProtectObjects>False</x:ProtectObjects>'+
+                    '<x:ProtectScenarios>False</x:ProtectScenarios></x:WorksheetOptions>' +
+                    '</x:ExcelWorksheet></x:ExcelWorksheets><x:WindowHeight>8835</x:WindowHeight>' +
+                    '<x:WindowWidth>15180</x:WindowWidth>'+
+                    ' <x:WindowTopX>120</x:WindowTopX><x:WindowTopY>105</x:WindowTopY>' +
+                    '<x:ProtectStructure>False</x:ProtectStructure>' +
+                    '<x:ProtectWindows>False</x:ProtectWindows></x:ExcelWorkbook>'+
                     '</xml><![endif]-->'+
 
                     ' <title></title>'+
@@ -261,9 +283,21 @@
                     worksheet: name || 'Worksheet',
                     table: table.innerHTML
                 }
-                window.location.href = uri + base64(format(template, ctx))
+
+                var link = document.createElement("a");
+                link.download = "atsargos.xls";
+                link.href = uri + base64(format(template, ctx));
+                link.click();
+
+
+
             }
         })()
+
+
+
+
+
 
     </script>
 
@@ -305,3 +339,22 @@
         };
 
     </script>
+
+
+
+<script>
+    function doit(type, fn, dl) {
+
+        var elt = document.getElementById('examplecopy');
+        var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet JS" });
+        return dl ?
+            XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+            XLSX.writeFile(wb, fn || ('test.' + (type || 'xlsx')));
+    }
+</script>
+
+
+@endsection
+
+
+
