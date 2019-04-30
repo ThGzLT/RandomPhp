@@ -1,32 +1,37 @@
-<table id="examplecopy10" class="table table-striped">
+<table hidden id="examplecopy10" class="table table-striped">
     <thead>
     <tr>
 
     <tr>
-        <th>id</th>
         <th>Produkto kodas</th>
         <th>Produktas</th>
         <th>Matas</th>
-        <th>Kiekis</th>
         <th>aprasymas</th>
-        <th>KOREGUOTI</th>
-
+        <th>Kiekis</th>
+        <th>kaina</th>
+        <th>suma</th>
     </tr>
 
 
     </thead>
     <tbody>
+    <?php
+            use Illuminate\Support\Facades\Auth;
+    $skaiciususer = isset(Auth::user()->id) ? Auth::user()->id : Auth::user()->email;
+    ?>
     @foreach ($kopijos as $recor)
+        @if($recor->tag == $skaiciususer)
         <tr>
-            <td>    {{  $recor->id }} </td>
+
             <td>    {{  $recor->produkto_kodas }} </td>
             <td>    {{  $recor->produktas }} </td>
             <td>    {{  $recor->matas }} </td>
+            <td>   {{  $recor->aprasymas }} </td>
             <td>    {{  $recor->kiekis }} </td>
-            <td>    {{  $recor->aprasymas }} </td>
-            <td><a href="{{ route('nukreipymas2',$recor->id)}}" class="btn btn-primary">Edit</a></td>
+            <td></td>
+            <td></td>
         </tr>
-
+@endif
     @endforeach
 
 

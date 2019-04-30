@@ -1,0 +1,427 @@
+@extends('layouts.rodymas')
+
+@section('content')
+    <?php
+    use App\Http\Middleware\Authenticate;
+
+    ?>
+    <?php
+    $xml = simplexml_load_file("http://vaistukai.kul.lt/phpServices/getLikuciaiXML.php") or die("Error: Cannot create object");
+    $json = json_encode($xml);
+    $array = json_decode($json, TRUE);
+    date_default_timezone_set('Etc/GMT-3');
+    ?>
+
+
+    <style>
+
+        table.table th, table.table td {
+            padding-top: 0rem;
+            padding-bottom: 0rem;
+        }
+        table.dataTable tbody th, table.dataTable tbody td {
+            padding: 0px;
+        }
+        #examplecopy > tbody > tr.hover.odd > td > button {
+            padding: 0;
+            visibility: hidden;
+        }
+        i.fa.fa-remove:hover {
+
+            transform: scale(3);
+        }
+
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <table id="example" class="table table-striped table-bordered" style="width:100% ;    text-align: center;
+">
+        <thead>
+        <tr>
+            <th scope="col"  style="text-align: center;">Produkto kodas</th>
+            <th scope="col" style="text-align: left;">Produktas</th>
+            <th scope="col">Matas</th>
+            <th scope="col">Kiekis</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($array as $alt)
+            @foreach($alt as $track)
+                <tr class="hover">
+
+                    <td class="tikr" style="text-align: center; border:thin solid black; border-style:hidden;   vertical-align: middle;">{{$track['produkto_kodas']}}  </td>
+                    <td style="text-align: left; border:thin solid black; border-style:hidden;   vertical-align: middle;">{{$track['produktas']}}</td>
+                    <td style="text-align: center;border:thin solid black  ; border-style:hidden; vertical-align: middle;">{{$track['matas']}}</td>
+                    <td class="SecondTable" style="border:thin solid black ;  border-style:hidden; vertical-align: middle;">{{$track['kiekis']}}</td>
+                    <td class="SecondTable" style="border:thin solid black; border-style:hidden;">    <button id="Prideti"><i class="fa fa-plus" style="font-size:24px;color:green;padding-top: 3px; visibility: visible";></i></button></td>
+
+                </tr>
+            @endforeach
+        @endforeach
+        </tbody>
+    </table>
+
+    <div><h1></h1></div>
+    <div id="Perskyra">
+        <h2>Pasirinktos prekės</h2>
+    </div>
+
+    <input type="button" onclick="tableToExcel('example', 'Medžiagų pareikalavimas')" value="XLSX">
+    <!-- <button id="exportas">DOCX</button> -->
+
+    <div id="docx">
+        <div class="WordSection1">
+
+            <table id="examplecopy" class="table" style="text-align: center;margin-top: 20px;">
+                <thead>
+
+                <tr>
+                    <th colspan="10" hidden style="text-align: left; font-size: 16px">VšĮ KLAIPĖDOS UNIVERSITETINĖ LIGONINĖ</th>
+                </tr>
+                <tr hidden></tr>
+                <tr>
+                    <th colspan="10" hidden style=" font-size: 16px; text-align:center;">INŽINIERINIS TECHNIKOS DEPARTAMENTAS</th>
+                </tr>
+                <tr hidden></tr>
+                <tr>
+
+                    <th colspan="10" style=" font-size: 16px" id="textTwo" hidden></th>
+                </tr>
+                <tr hidden></tr>
+                <tr>
+                    <th colspan="10" hidden style=" font-size: 16px">MEDŽIAGŲ PAREIKALAVIMAS IŠ MATERIALINIŲ VERTYBIŲ SANDĖLIO</th>
+                </tr>
+                <tr>
+                    <th colspan="10" hidden style=" font-size: 16px">{{ date('Y-m-d H:i:s') }}</th>
+                </tr>
+                <tr hidden></tr>
+
+
+                <tr >
+
+                    <th style="border:thin solid black;width: 120px;vertical-align: middle; text-align: center;border-style:hidden;">Produkto kodas</th>
+                    <th style="border:thin solid black; width: 220px;vertical-align: middle; text-align: left;border-style:hidden;">Produktas</th>
+                    <th style="border:thin solid black; width: 90px;vertical-align: middle;border-style:hidden;">Matas</th>
+                    <th colspan="4" style="border:thin solid black;vertical-align: middle;border-style:hidden;">Paskirtis</th>
+                    <th hidden style="border:thin solid black; width:90px;vertical-align: middle;border-style:hidden;">Kaina</th>
+                    <th  style="border:thin solid black; width:90px;vertical-align: middle;border-style:hidden;">Kiekis</th>
+                    <th hidden style="border:thin solid black; width:110px;vertical-align: middle;border-style:hidden;">Suma</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+
+
+
+                </tbody>
+                <tr hidden></tr>
+                <tr>
+                    <th hidden style="font-weight: bold"><b>SUTINKU:</b></th>
+                    <th hidden></th>
+                    <th hidden></th>
+                    <th colspan="7" hidden style="font-weight: bold">Gavėjas: {{{ isset(Auth::user()->name) ? Auth::user()->name : Auth::user()->email }}}
+                        {{--   {{{ isset(Auth::user()->email) ? Auth::user()->email : Auth::user()->name }}}    --}}         </th>
+                </tr>
+
+                <tr>
+                    <th colspan="3" hidden style="font-weight: normal">Inžinerinio technikos departamento vadovas</th>
+
+                </tr>
+
+
+            </table>
+        </div>
+        <button id="button-a">Create Excel</button>
+        <button id="button-b">TableExportExcel</button>
+    </div>
+    </div>
+<script>
+
+        $("#button-b").click(function(){
+            var FormatsTable = document.getElementById('examplecopy');
+            new TableExport(FormatsTable, {
+                headers: true,                      // (Boolean), display table headers (th or td elements) in the <thead>, (default: true)
+                footers: true,                      // (Boolean), display table footers (th or td elements) in the <tfoot>, (default: false)
+                formats: ["xlsx", "csv", "txt"],    // (String[]), filetype(s) for the export, (default: ['xlsx', 'csv', 'txt'])
+                filename: "id",                     // (id, String), filename for the downloaded file, (default: 'id')
+                bootstrap: false,                   // (Boolean), style buttons using bootstrap, (default: true)
+                exportButtons: true,                // (Boolean), automatically generate the built-in export buttons for each of the specified formats (default: true)
+                position: "bottom",                 // (top, bottom), position of the caption element relative to table, (default: 'bottom')
+                ignoreRows: null,                   // (Number, Number[]), row indices to exclude from the exported file(s) (default: null)
+                ignoreCols: null,                   // (Number, Number[]), column indices to exclude from the exported file(s) (default: null)
+                trimWhitespace: true,               // (Boolean), remove all leading/trailing newlines, spaces, and tabs from cell text in the exported file(s) (default: false)
+                RTL: false,                         // (Boolean), set direction of the worksheet to right-to-left (default: false)
+                sheetname: "id"                     // (id, String), sheet name for the exported spreadsheet, (default: 'id')
+            });
+
+
+    });
+
+
+
+
+</script>
+    customize: function(xlsx) {
+    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+    // Loop over the cells in column `C`
+    $('row c[r^="C"]', wb).each( function () {
+    // Get the value
+    if ( $('is t', this).text() == 'VNT' ) {
+    $(this).attr( 's', '20' );
+    }
+    });
+    }
+
+    <script>
+        var wb = XLSX.utils.table_to_book(document.getElementById('examplecopy'), {sheet:"Sheet JS"});
+        var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:true, type: 'binary'});
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+
+            return buf;
+
+
+        }
+        $("#button-a").click(function(){
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+
+            $('#myselection').on('change', function () {
+
+
+                $(this).closest('form').submit();
+                $("#textTwo").empty();
+
+                $("#myselection option:selected").clone().appendTo('#textTwo');
+            })
+
+        });
+
+    </script>
+    <style>
+
+        .ui-helper-hidden-accessible { display:none; }
+
+    </style>
+    <script>
+        var tags = [
+            "Valgykla",
+            "Chirurgija",
+            "Neurochirurgija",
+            "Psichologija",
+            "Administracija",
+            "Konsultacija",
+            "Priemimas"
+        ];
+
+
+
+
+        var count = 10;
+
+        console.log(count);
+        $("#example").on("click", "button", function() {
+
+            count++;
+
+
+            $(this).closest("tr").clone().appendTo('#examplecopy')
+                .append("<td id='tags' colspan='4'  class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:justify;border-style:hidden; vertical-align: middle; width:250px\"></td>")
+                .append("<td hidden   class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;border-style:hidden; \"></td>")
+                .append("<td    class=\"SecTable\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;border-style:hidden; \"></td>")
+                .append("<td id='Akselis' value="+count+" hidden  x:num x:fmla=\"=SUM(H" + count + " *I" + count +")\" class=\"ekselis\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;border-style:hidden;\"><a name=\"NameRange1\"></a></td>")
+                .append("<td hidden style='vertical-align: middle; text-align: left; width: 50px;border-style:hidden;\'></td>")
+                .append("<button style='padding: 0;\n" +
+                    "        '><i class=\"fa fa-remove\" style=\"font-size:20px;color:red;visibility: visible;vertical-align: middle; margin-top: -2px;\"></i></button>").find('td.SecondTable').remove();
+            $( "td.SecTable" ).autocomplete({
+                source: tags })
+        });
+
+
+
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#myselection').on('change', function () {
+                if ("#textTwo:not(:empty)") {
+                    $(this).closest("#textTwo").find("#vartotojoskyrius").remove();
+
+                }
+            });
+        });
+    </script>
+
+    <script>
+
+        $("#examplecopy").on("click", "button", function() {
+            $(this).closest("tr").remove();
+
+            count--;
+            var i = 11;
+            for (i = 11; i <= count; i++)
+            {
+                var skaicius = 10;
+                $("#examplecopy").find('.ekselis').each(function () {
+                    skaicius++;
+                    $(this).replaceWith("<td id='Akselis' value="+count+" hidden  x:num x:fmla=\"=SUM(H" + skaicius + " *I" + skaicius +")\" class=\"ekselis\" contenteditable=\"true\" style=\"border:thin solid black; text-align:center;  vertical-align: middle;border-style:hidden;\"><a name=\"NameRange1\"></a></td>")
+
+                })
+
+            }
+
+        });
+
+    </script>
+
+    <script>
+
+        var tableToExcel = (function() {
+
+            var uri = 'data:application/vnd.ms-excel;base64,',
+
+                template = '<html xmlns:v="urn:schemas-microsoft-com:vml"xmlns:o="urn:schemas-microsoft-com:office:office"xmlns:x="urn:schemas-microsoft-com:office:excel"xmlns="http://www.w3.org/TR/REC-html40">'+
+                    '<head> <meta http-equiv=Content-Type content="text/html; charset=utf-8"> <meta name=ProgId content=Excel.Sheet> <meta name=Generator content="Microsoft Excel 11">'+
+                    ' <!--[if gte mso 9]><xml>' +
+                    '<o:DocumentProperties><o:Author>Pat Willener</o:Author>' +
+                    '<o:Company>Good Day Books</o:Company>'+
+                    '  </o:DocumentProperties><o:OfficeDocumentSettings><o:RelyOnVML/><o:AllowPNG/></o:OfficeDocumentSettings>'+
+                    '  </xml><![endif]-->'+
+                    ' <style><!--table {mso-displayed-decimal-separator:"\.";mso-displayed-thousand-separator:"\,";}  @page {mso-header-data:"&";  mso-footer-data:"Puslapis &P iš &N";'+
+                    ' margin:.31in .31in .31in .31in;  mso-header-margin:0in;  mso-footer-margin:0in;  mso-page-orientation:landscape;}  --></style>'+
+                    ' <!--[if gte mso 9]><xml>' +
+                    '<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
+                    '<x:Name></x:Name><x:WorksheetOptions><x:Print><x:ValidPrinterInfo/>'+
+                    ' <x:PaperSizeIndex>9</x:PaperSizeIndex>' +
+                    '<x:HorizontalResolution>600</x:HorizontalResolution>' +
+                    '<x:VerticalResolution>600</x:VerticalResolution></x:Print><x:Selected/>'+
+                    ' <x:Panes><x:Pane>' +
+                    '<x:Number>1</x:Number>' +
+                    '<x:ActiveRow>1</x:ActiveRow>' +
+                    ' <x:RangeSelection>$I$1:$J$1</x:RangeSelection>' +
+                    '</x:Pane>' +
+                    '</x:Panes>' +
+                    '<x:ProtectContents>False</x:ProtectContents>' +
+                    '<x:ProtectObjects>False</x:ProtectObjects>'+
+                    '<x:ProtectScenarios>False</x:ProtectScenarios></x:WorksheetOptions>' +
+
+                    '</x:ExcelWorksheet></x:ExcelWorksheets><x:WindowHeight>8835</x:WindowHeight>' +
+                    '<x:WindowWidth>15180</x:WindowWidth>'+
+                    ' <x:WindowTopX>120</x:WindowTopX><x:WindowTopY>105</x:WindowTopY>' +
+                    '<x:ProtectStructure>False</x:ProtectStructure>' +
+                    '<x:ProtectWindows>False</x:ProtectWindows></x:ExcelWorkbook>'+
+                    '</xml><![endif]-->'+
+
+                    ' <title></title>'+
+
+                    '</head><body><table><caption>{table}</caption></table></body></html>'
+            base64 = function(s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+                format = function(s, c) {
+                    return s.replace(/{(\w+)}/g, function(m, p) {
+                        return c[p];
+                    })
+                }
+            return function(table, name) {
+                if (!table.nodeType) table = document.getElementById("examplecopy")
+                var ctx = {
+                    worksheet: name || 'Worksheet',
+                    table: table.innerHTML
+                }
+
+                var link = document.createElement("a");
+                link.download = "atsargos.xls";
+                link.href = uri + base64(format(template, ctx));
+                const blob = new Blob([format(template, ctx)], {
+                    type: "application/vnd.ms-excel;charset=utf-8"
+                });
+                saveAs(blob, "Atsargos.xls");
+
+
+
+            }
+        })()
+
+
+
+
+
+
+    </script>
+
+    <script>
+
+        window.export.onclick = function() {
+
+            if (!window.Blob) {
+                alert('Your legacy browser does not support this action.');
+                return;
+            }
+
+            var html, link, blob, url, css;
+
+
+
+            css = (
+                '<style>' +
+                '@page WordSection1{size: 841.95pt 595.35pt;mso-page-orientation: landscape;}' +
+                'div.WordSection1 {page: WordSection1;}' +
+
+                '</style>'
+            );
+
+            html = window.docx.innerHTML;
+            blob = new Blob(['\ufeff', css + html], {
+                type: 'application/msword'
+            });
+            url = URL.createObjectURL(blob);
+            link = document.createElement('A');
+            link.href = url;
+            // Set default file name.
+            // Word will append file extension - do not add an extension here.
+            link.download = 'Document';
+            document.body.appendChild(link);
+            if (navigator.msSaveOrOpenBlob ) navigator.msSaveOrOpenBlob( blob, 'Document.doc'); // IE10-11
+            else link.click();  // other browsers
+            document.body.removeChild(link);
+        };
+
+    </script>
+
+
+
+
+
+@endsection
+
+
+
+
+
+
+
+
+
+
+
